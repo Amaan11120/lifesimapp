@@ -10,12 +10,15 @@ body{font-family:Georgia,serif;background:#f3efe6;color:#23201b;max-width:480px;
 button{font:inherit;font-size:16px;padding:14px;border-radius:10px;border:1px solid #ddd5c4;background:#fffdf8}
 .main{grid-column:1/-1;background:#2f6f5e;color:#fff;font-weight:bold}
 input{font:inherit;width:100%;padding:12px;margin:10px 0;box-sizing:border-box}
+#log{max-height:260px;overflow-y:auto}
 #log p{margin:0 0 8px;border-bottom:1px solid #ddd5c4;padding-bottom:6px}
+#log p.bad{color:#b3402e}
 .hide{display:none}
 </style></head><body>
 <div id="start" class="card"><h1>Life Sim</h1>
 <input id="name" placeholder="Name your character">
-<button class="main" style="width:100%" onclick="newLife()">Start life</button></div>
+<button class="main" style="width:100%" onclick="newLife()">Start life</button>
+<button id="cont" class="hide" style="width:100%;margin-top:8px" onclick="cont()">Continue saved life</button></div>
 <div id="game" class="hide">
 <div class="card"><div class="age" id="age"></div><div id="who"></div>
 Health<div class="bar"><i id="hb"></i></div>
@@ -27,33 +30,59 @@ Smarts<div class="bar"><i id="sb"></i></div>
 <button onclick="act(study)">Study</button>
 <button onclick="act(gym)">Exercise</button>
 <button onclick="act(job)">Find job</button>
-<button onclick="act(fun)">Have fun</button></div>
+<button onclick="act(fun)">Have fun</button>
+<button id="love" onclick="act(love)">Find love</button>
+<button onclick="act(crime)">Crime</button></div>
 <div class="card" style="margin-top:12px"><div id="log"></div></div></div>
 <div id="over" class="card hide"><h2 id="ot"></h2><p id="ox"></p>
 <button class="main" style="width:100%" onclick="location.reload()">Live again</button></div>
 <script>
 const J={Cashier:[0,12000],Teacher:[60,30000],Engineer:[75,60000],Doctor:[90,100000]};
-const E=[["You found $50!",0,5,50],["You caught the flu.",-10,-5,0],["A friend threw you a party.",0,10,-20],["You got scammed online.",0,-10,-100],["Great day outside.",5,5,0],["You broke your arm.",-15,-5,-200],["You made a new friend.",0,8,0],["You got a bonus.",0,6,500]];
+const E=[["You found $50!",0,5,50],["You caught the flu.",-10,-5,0],["A friend threw you a party.",0,10,-20],["You got scammed online.",0,-10,-100],["Great day outside.",5,5,0],["You broke your arm.",-15,-5,-200],["You made a new friend.",0,8,0],["You got a bonus.",0,6,500],["You won a small lottery.",0,10,300],["Your phone got stolen.",0,-8,-250]];
 let p;const $=i=>document.getElementById(i);
 const cl=v=>Math.max(0,Math.min(100,v));
 const r=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
-function log(t){const e=document.createElement("p");e.innerHTML=t;$("log").prepend(e)}
-function render(){$("age").textContent="Age "+p.age;$("who").textContent=p.name;
+const m$=n=>(n<0?"-":"")+"$"+Math.abs(n).toLocaleString();
+const pay=()=>Math.round(J[p.job][1]*(1+0.05*p.yrs));
+function log(t,bad){const e=document.createElement("p");if(bad)e.className="bad";e.innerHTML=t;$("log").prepend(e)}
+function save(){try{localStorage.setItem("lifesim",JSON.stringify(p))}catch(e){}}
+function clear(){try{localStorage.removeItem("lifesim")}catch(e){}}
+function render(){$("age").textContent="Age "+p.age;$("who").textContent=p.name+(p.love==="married"?" (married)":p.love==="dating"?" (dating)":"");
 $("hb").style.width=p.health+"%";$("pb").style.width=p.happy+"%";$("sb").style.width=p.smart+"%";
-$("stat").textContent="$"+p.money+" | "+(p.job||"No job")}
-function newLife(){p={name:$("name").value||"Alex",age:0,health:100,happy:70,smart:r(30,80),money:0,job:null};
-$("start").classList.add("hide");$("game").classList.remove("hide");log(p.name+" was born.");render()}
-function ageUp(){p.age++;if(p.job)p.money+=J[p.job][1];
-p.health=cl(p.health-r(0,2)-Math.floor(p.age/30));let m="Age "+p.age+".";
+$("stat").textContent=m$(p.money)+" | "+(p.job?p.job+" ("+m$(pay())+"/yr)":"No job");
+$("love").textContent=p.love==="none"?"Find love":p.love==="dating"?"Propose":"Date night"}
+function show(){$("start").classList.add("hide");$("game").classList.remove("hide");render()}
+function newLife(){p={name:$("name").value||"Alex",age:0,health:100,happy:70,smart:r(30,80),money:0,job:null,yrs:0,love:"none",crimes:0};
+$("log").innerHTML="";log(p.name+" was born.");show();save()}
+function cont(){try{p=JSON.parse(localStorage.getItem("lifesim"));$("log").innerHTML="";log("Welcome back, "+p.name+".");show()}catch(e){}}
+function ageUp(){p.age++;let m="Age "+p.age+".";
+if(p.job){p.money+=pay();p.yrs++}
+p.health=cl(p.health-r(0,2)-Math.floor(p.age/30));
+if(p.love!=="none"){p.happy=cl(p.happy+2);
+if(Math.random()<(p.love==="dating"?0.1:0.03)){p.love="none";p.happy=cl(p.happy-20);m+=" Your relationship ended."}}
+if(p.age===6)m+=" You started school.";
+if(p.age===18)m+=p.smart>=70?" You graduated top of your class!":" You finished school.";
 if(Math.random()<.5){const e=E[r(0,E.length-1)];p.health=cl(p.health+e[1]);p.happy=cl(p.happy+e[2]);p.money+=e[3];m+=" "+e[0]}
 log(m)}
-function study(){p.smart=cl(p.smart+5);p.happy=cl(p.happy-3);log("You studied.")}
+function study(){p.smart=cl(p.smart+(p.age<18?7:4));p.happy=cl(p.happy-3);log("You studied hard.")}
 function gym(){p.health=cl(p.health+5);log("You worked out.")}
 function fun(){p.happy=cl(p.happy+6);p.money-=20;log("Fun day. -$20")}
-function job(){if(p.age<18){log("Too young to work.");return}
-const o=Object.keys(J).filter(j=>p.smart>=J[j][0]);p.job=o[r(0,o.length-1)];log("You got a job: "+p.job)}
+function job(){if(p.age<18){log("Too young to work.",1);return}
+const o=Object.keys(J).filter(j=>p.smart>=J[j][0]);p.job=o[r(0,o.length-1)];p.yrs=0;log("You got a job: <b>"+p.job+"</b>")}
+function love(){if(p.age<16){log("Too young for love.",1);return}
+if(p.love==="none"){if(Math.random()<0.3+p.happy/200){p.love="dating";p.happy=cl(p.happy+10);log("You started dating someone!")}else{p.happy=cl(p.happy-3);log("No luck finding love.",1)}}
+else if(p.love==="dating"){if(p.age<20){log("Too young to marry.",1);return}
+if(Math.random()<0.7){p.love="married";p.happy=cl(p.happy+15);p.money-=2000;log("You got married! Wedding cost $2,000.")}else{p.love="none";p.happy=cl(p.happy-20);log("They said no. Breakup.",1)}}
+else{p.happy=cl(p.happy+8);p.money-=100;log("Date night. -$100")}}
+function crime(){if(p.age<14){log("Too young for crime.",1);return}
+if(Math.random()<0.5){const g=r(200,2000);p.money+=g;p.happy=cl(p.happy-5);log("The crime worked. +"+m$(g))}
+else{p.crimes++;p.job=null;p.yrs=0;p.happy=cl(p.happy-20);p.health=cl(p.health-10);log("You got caught! Jailed and lost your job.",1)}}
 function act(f){f();render();
 if(p.health<=0||(p.age>=70&&Math.random()<(p.age-70)/50)){
-$("game").classList.add("hide");$("over").classList.remove("hide");
-$("ot").textContent=p.name+" died at "+p.age;$("ox").textContent="Money: $"+p.money}}
+clear();$("game").classList.add("hide");$("over").classList.remove("hide");
+const t=p.money>=300000?"died rich":p.money<0?"died in debt":"lived a simple life";
+$("ot").textContent=p.name+" "+t+" at "+p.age;
+$("ox").textContent="Money: "+m$(p.money)+" | Job: "+(p.job||"none")+" | Love: "+p.love+" | Crimes: "+p.crimes+" | Smarts: "+p.smart}
+else save()}
+try{if(localStorage.getItem("lifesim"))$("cont").classList.remove("hide")}catch(e){}
 </script></body></html>
