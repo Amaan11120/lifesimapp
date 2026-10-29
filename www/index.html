@@ -1,0 +1,59 @@
+<!DOCTYPE html><html><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Life Sim</title><style>
+body{font-family:Georgia,serif;background:#f3efe6;color:#23201b;max-width:480px;margin:0 auto;padding:16px}
+.card{background:#fffdf8;border:1px solid #ddd5c4;border-radius:10px;padding:14px;margin-bottom:12px}
+.age{font-size:44px;font-weight:bold}
+.bar{height:8px;background:#ddd5c4;border-radius:4px;margin:3px 0 10px}
+.bar i{display:block;height:100%;background:#2f6f5e;border-radius:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button{font:inherit;font-size:16px;padding:14px;border-radius:10px;border:1px solid #ddd5c4;background:#fffdf8}
+.main{grid-column:1/-1;background:#2f6f5e;color:#fff;font-weight:bold}
+input{font:inherit;width:100%;padding:12px;margin:10px 0;box-sizing:border-box}
+#log p{margin:0 0 8px;border-bottom:1px solid #ddd5c4;padding-bottom:6px}
+.hide{display:none}
+</style></head><body>
+<div id="start" class="card"><h1>Life Sim</h1>
+<input id="name" placeholder="Name your character">
+<button class="main" style="width:100%" onclick="newLife()">Start life</button></div>
+<div id="game" class="hide">
+<div class="card"><div class="age" id="age"></div><div id="who"></div>
+Health<div class="bar"><i id="hb"></i></div>
+Happy<div class="bar"><i id="pb"></i></div>
+Smarts<div class="bar"><i id="sb"></i></div>
+<div id="stat"></div></div>
+<div class="grid">
+<button class="main" onclick="act(ageUp)">Age up</button>
+<button onclick="act(study)">Study</button>
+<button onclick="act(gym)">Exercise</button>
+<button onclick="act(job)">Find job</button>
+<button onclick="act(fun)">Have fun</button></div>
+<div class="card" style="margin-top:12px"><div id="log"></div></div></div>
+<div id="over" class="card hide"><h2 id="ot"></h2><p id="ox"></p>
+<button class="main" style="width:100%" onclick="location.reload()">Live again</button></div>
+<script>
+const J={Cashier:[0,12000],Teacher:[60,30000],Engineer:[75,60000],Doctor:[90,100000]};
+const E=[["You found $50!",0,5,50],["You caught the flu.",-10,-5,0],["A friend threw you a party.",0,10,-20],["You got scammed online.",0,-10,-100],["Great day outside.",5,5,0],["You broke your arm.",-15,-5,-200],["You made a new friend.",0,8,0],["You got a bonus.",0,6,500]];
+let p;const $=i=>document.getElementById(i);
+const cl=v=>Math.max(0,Math.min(100,v));
+const r=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+function log(t){const e=document.createElement("p");e.innerHTML=t;$("log").prepend(e)}
+function render(){$("age").textContent="Age "+p.age;$("who").textContent=p.name;
+$("hb").style.width=p.health+"%";$("pb").style.width=p.happy+"%";$("sb").style.width=p.smart+"%";
+$("stat").textContent="$"+p.money+" | "+(p.job||"No job")}
+function newLife(){p={name:$("name").value||"Alex",age:0,health:100,happy:70,smart:r(30,80),money:0,job:null};
+$("start").classList.add("hide");$("game").classList.remove("hide");log(p.name+" was born.");render()}
+function ageUp(){p.age++;if(p.job)p.money+=J[p.job][1];
+p.health=cl(p.health-r(0,2)-Math.floor(p.age/30));let m="Age "+p.age+".";
+if(Math.random()<.5){const e=E[r(0,E.length-1)];p.health=cl(p.health+e[1]);p.happy=cl(p.happy+e[2]);p.money+=e[3];m+=" "+e[0]}
+log(m)}
+function study(){p.smart=cl(p.smart+5);p.happy=cl(p.happy-3);log("You studied.")}
+function gym(){p.health=cl(p.health+5);log("You worked out.")}
+function fun(){p.happy=cl(p.happy+6);p.money-=20;log("Fun day. -$20")}
+function job(){if(p.age<18){log("Too young to work.");return}
+const o=Object.keys(J).filter(j=>p.smart>=J[j][0]);p.job=o[r(0,o.length-1)];log("You got a job: "+p.job)}
+function act(f){f();render();
+if(p.health<=0||(p.age>=70&&Math.random()<(p.age-70)/50)){
+$("game").classList.add("hide");$("over").classList.remove("hide");
+$("ot").textContent=p.name+" died at "+p.age;$("ox").textContent="Money: $"+p.money}}
+</script></body></html>
