@@ -1,202 +1,215 @@
 <!DOCTYPE html><html><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
 <title>Life Sim</title><style>
-body{font-family:Georgia,serif;background:#f3efe6;color:#23201b;max-width:480px;margin:0 auto;padding:16px}
-.card{background:#fffdf8;border:1px solid #ddd5c4;border-radius:10px;padding:14px;margin-bottom:12px}
-.age{font-size:44px;font-weight:bold}
-.bar{height:8px;background:#ddd5c4;border-radius:4px;margin:3px 0 8px}
-.bar i{display:block;height:100%;background:#2f6f5e;border-radius:4px}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-button{font:inherit;font-size:16px;padding:14px;border-radius:10px;border:1px solid #ddd5c4;background:#fffdf8;color:#23201b}
-.main{grid-column:1/-1;background:#2f6f5e;color:#fff;font-weight:bold}
-input{font:inherit;width:100%;padding:12px;margin:10px 0;box-sizing:border-box}
-#log{max-height:260px;overflow-y:auto}
-#log p{margin:0 0 8px;border-bottom:1px solid #ddd5c4;padding-bottom:6px}
-#log p.bad{color:#b3402e}
-#dec{border:2px solid #2f6f5e}
-.pc{border:1px solid #ddd5c4;border-radius:8px;padding:8px;margin-bottom:8px}
-.pc.on{border:2px solid #2f6f5e}
-.row{display:flex;justify-content:space-between}
-small{color:#6f685c}
-.hide{display:none}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0 auto;font-family:Georgia,serif;background:#f3efe6;color:#23201b;padding:8px;max-width:480px;user-select:none;-webkit-user-select:none}
+.card{background:#fffdf8;border:1px solid #ddd5c4;border-radius:10px;padding:10px;margin-bottom:8px}
+.bars{display:flex;gap:6px;margin-top:4px}.bars>div{flex:1;font-size:11px}
+.bar{height:6px;background:#ddd5c4;border-radius:3px;margin-top:2px}.bar i{display:block;height:100%;background:#2f6f5e;border-radius:3px}
+button{font:inherit;font-size:14px;padding:10px;border-radius:10px;border:1px solid #ddd5c4;background:#fffdf8;color:#23201b}
+button:disabled{opacity:.5}
+.go{background:#2f6f5e;color:#fff;font-weight:bold}
+#cv{display:block;margin:0 auto 8px;height:42vh;aspect-ratio:320/430;image-rendering:pixelated;border:1px solid #ddd5c4;border-radius:8px;touch-action:none}
+#dpad{display:grid;grid-template-columns:repeat(3,46px);grid-template-rows:repeat(3,46px);gap:3px;touch-action:none}
+.dp{padding:0;font-size:18px;touch-action:none}
+#log{max-height:80px;overflow-y:auto;font-size:13px}
+#log p{margin:0 0 5px;border-bottom:1px solid #ddd5c4;padding-bottom:4px}#log p.bad{color:#b3402e}
+#modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9}
+.hide{display:none!important}
 </style></head><body>
 <div id="start" class="card"><h1>Life Sim</h1>
-<input id="name" placeholder="Name your character">
-<button class="main" style="width:100%" onclick="newLife()">Start life</button>
+<input id="name" placeholder="Name your character" style="width:100%;padding:12px;font:inherit;margin:8px 0">
+<button class="go" style="width:100%" onclick="newLife()">Start life</button>
 <button id="cont" class="hide" style="width:100%;margin-top:8px" onclick="cont()">Continue saved life</button></div>
 
 <div id="game" class="hide">
-<div class="card"><div class="age" id="age"></div><div id="who"></div>
-<div id="en" style="margin:6px 0"></div>
-Health<div class="bar"><i id="hb"></i></div>
-Happy<div class="bar"><i id="pb"></i></div>
-Smarts<div class="bar"><i id="sb"></i></div>
-<div id="stat"></div></div>
-
-<div id="dec" class="card hide"><p id="dq"></p>
-<div class="grid" style="margin:0"><button id="da" onclick="choose('a')"></button><button id="db" onclick="choose('b')"></button></div></div>
-
-<div id="main">
-<div class="grid">
-<button class="main" onclick="act(ageUp)">Age up</button>
-<button onclick="act(study)">Study</button>
-<button onclick="act(gym)">Exercise</button>
-<button id="bjob" onclick="act(job)">Find job</button>
-<button id="bwork" class="hide" onclick="act(work)">Work hard</button>
-<button onclick="act(fun)">Have fun</button>
-<button id="love" onclick="act(love)">Find love</button>
-<button onclick="act(crime)">Crime</button>
-<button id="kid" class="hide" onclick="act(kid)">Have a child</button>
-<button id="uni" class="hide" onclick="act(enroll)">University</button></div>
-<div class="card"><b>People</b><div id="ppl" style="margin-top:8px"></div>
-<div id="pa" class="grid hide" style="margin:0">
-<button onclick="act(()=>pa('talk'))">Talk</button>
-<button onclick="act(()=>pa('gift'))">Gift $50</button>
-<button class="main" onclick="act(()=>pa('fight'))">Fight</button></div></div>
-</div>
-
+<div class="card"><div style="display:flex;justify-content:space-between"><b id="age" style="font-size:20px"></b><span id="en"></span></div>
+<div id="who" style="font-size:12px;color:#6f685c"></div>
+<div class="bars"><div>Health<div class="bar"><i id="hb"></i></div></div><div>Happy<div class="bar"><i id="pb"></i></div></div><div>Smarts<div class="bar"><i id="sb"></i></div></div></div>
+<div id="stat" style="font-size:13px;margin-top:6px"></div></div>
+<canvas id="cv" width="320" height="430"></canvas>
+<div style="display:flex;gap:8px;margin-bottom:8px">
+<div id="dpad"><button class="dp" data-k="u" style="grid-area:1/2">▲</button><button class="dp" data-k="l" style="grid-area:2/1">◀</button><button class="dp" data-k="r" style="grid-area:2/3">▶</button><button class="dp" data-k="d" style="grid-area:3/2">▼</button></div>
+<div class="card" style="flex:1;margin:0"><b id="pt"></b><div id="acts"></div></div></div>
 <div class="card"><div id="log"></div></div></div>
 
-<div id="over" class="card hide"><h2 id="ot"></h2><p id="ox"></p><p id="oa"></p>
-<button id="nx" class="main" style="width:100%"></button></div>
+<div id="modal" class="hide"><div class="card" style="width:100%"><p id="dq"></p>
+<button id="da" style="width:100%;margin-bottom:8px" onclick="choose('a')"></button><button id="db" style="width:100%" onclick="choose('b')"></button></div></div>
+<div id="over" class="card hide"><h2 id="ot"></h2><p id="ox"></p><p id="oa"></p><button id="nx" class="go" style="width:100%"></button></div>
 
 <script>
-const J=0;
+const W=320,H=430;
 const NM=["Sam","Ali","Zara","Noor","Omar","Mia","Leo","Hana","Ravi","Lina","Tariq","Eva"];
 const TR={lucky:"Lucky",lazy:"Lazy",genius:"Genius",risky:"Risk-taker"};
 const TD={lucky:"better odds on risks",lazy:"only 2 actions a year",genius:"you learn faster",risky:"crime works more often"};
-const TITLES=["Intern","Associate","Senior","Manager","Director"];
-const PAY=[15000,28000,45000,70000,110000];
-let p,pend=null,pers=null;
+const TITLES=["Intern","Associate","Senior","Manager","Director"],PAY=[15000,28000,45000,70000,110000];
+const B=[["home",15,15,"Home","🏠","#c9a27a"],["school",125,15,"School","🏫","#d98f5c"],["uni",235,15,"University","🎓","#8a7bb5"],
+["gym",15,170,"Gym","🏋️","#6b8fb3"],["office",235,170,"Office","🏢","#7d8a96"],
+["cafe",15,325,"Cafe","☕","#b5805a"],["hospital",125,325,"Hospital","🏥","#d4686a"],["alley",235,325,"Dark alley","🕶️","#4a4a55"]
+].map(a=>({id:a[0],x:a[1],y:a[2],label:a[3],emoji:a[4],col:a[5]}));
+const PK={id:"park",label:"Park",emoji:"🌳"};
+let p,pend=null,pl={x:160,y:100,d:2,mv:false},near=null,zone=null,keys={},ver=0,pk="",last=0;
 const $=i=>document.getElementById(i);
 const cl=v=>Math.max(0,Math.min(100,v));
 const r=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const m$=n=>(n<0?"-":"")+"$"+Math.abs(n).toLocaleString();
-const mk=(role,emoji,rel)=>({name:NM[r(0,NM.length-1)],role,emoji,rel});
-const ch=role=>p.chars.find(c=>c.role===role);
-const has=role=>!!ch(role);
-const nm=role=>ch(role).name;
+const hc=(s,k)=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))%997;return"hsl("+(h*k%360)+",45%,45%)"};
+const mk=(role,emoji,rel)=>({name:NM[r(0,11)],role,emoji,rel,x:r(20,300),y:r(110,160),vx:0,vy:0,t:0,d:2});
+const ch=role=>p.chars.find(c=>c.role===role),has=role=>!!ch(role),nm=role=>ch(role).name;
 const rel=(role,d)=>{const c=ch(role);if(c)c.rel=cl(c.rel+d)};
 const maxEn=()=>p.trait==="lazy"?2:3;
 function log(t,bad){const e=document.createElement("p");if(bad)e.className="bad";e.innerHTML=t;$("log").prepend(e)}
-function save(){try{localStorage.setItem("ls3",JSON.stringify(p))}catch(e){}}
-function wipe(){try{localStorage.removeItem("ls3")}catch(e){}}
-function bad(){try{return JSON.parse(localStorage.getItem("ls_badges")||"[]")}catch(e){return[]}}
-function unlock(id,label){const b=bad();if(b.includes(id))return;b.push(id);try{localStorage.setItem("ls_badges",JSON.stringify(b))}catch(e){}log("🏆 Achievement: "+label)}
-const BD=[["grad","High school graduate",()=>p.grad],["deg","University graduate",()=>p.degree],["wed","Got married",()=>p.love==="married"],["par","Became a parent",()=>p.kids>0],["rich","Rich ($100,000)",()=>p.money>=100000],["dir","Became Director",()=>p.job&&p.lvl===4],["jail","Jailbird (3 arrests)",()=>p.crimes>=3],["bff","Best friend (95+)",()=>has("Friend")&&ch("Friend").rel>=95],["old","Lived to 80",()=>p.age>=80]];
-function badges(){BD.forEach(b=>{if(b[2]())unlock(b[0],b[1])})}
-function use(){if(p.en<=0){log("No energy left this year. Age up.",1);return false}p.en--;return true}
+function save(){try{localStorage.setItem("ls4",JSON.stringify(p))}catch(e){}}
+function wipe(){try{localStorage.removeItem("ls4")}catch(e){}}
+function bad(){try{return JSON.parse(localStorage.getItem("ls_b4")||"[]")}catch(e){return[]}}
+function unlock(id,label){const b=bad();if(b.includes(id))return;b.push(id);try{localStorage.setItem("ls_b4",JSON.stringify(b))}catch(e){}log("🏆 "+label)}
+const BD=[["grad","High school graduate",()=>p.grad],["deg","University graduate",()=>p.degree],["wed","Got married",()=>p.love==="married"],["par","Became a parent",()=>p.kids>0],["rich","Rich ($100,000)",()=>p.money>=100000],["dir","Became Director",()=>p.job&&p.lvl===4]];
+const badges=()=>BD.forEach(b=>{if(b[2]())unlock(b[0],b[1])});
+function use(){if(p.en<=0){log("No energy left this year. Sleep at home to age up.",1);return false}p.en--;return true}
 
-function render(){
-if(!ch(pers))pers=null;
+function render(){ver++;
 $("age").textContent="Age "+p.age;
 const st=p.love==="married"?"married":p.love==="dating"?"dating":"single";
 $("who").textContent=p.name+" · "+TR[p.trait]+" · "+st+(p.kids?" · "+p.kids+" kid"+(p.kids>1?"s":""):"")+(p.gen>1?" · Gen "+p.gen:"");
 $("en").textContent="Energy "+"●".repeat(p.en)+"○".repeat(maxEn()-p.en);
 $("hb").style.width=p.health+"%";$("pb").style.width=p.happy+"%";$("sb").style.width=p.smart+"%";
 const w=p.uni>0?"University ("+p.uni+" yr left)":p.grade>0?"Grade "+p.grade:p.job?TITLES[p.lvl]+" ("+m$(PAY[p.lvl])+"/yr) perf "+p.perf+"/60":p.grad?"Graduate, no job":"Not in school";
-$("stat").textContent=m$(p.money)+" | "+w;
-$("love").textContent=p.love==="none"?"Find love":p.love==="dating"?"Propose":"Date night";
-$("bjob").classList.toggle("hide",p.job||p.age<18);
-$("bwork").classList.toggle("hide",!p.job);
-$("kid").classList.toggle("hide",!(p.love==="married"&&p.age>=22));
-$("uni").classList.toggle("hide",!(p.grad&&!p.degree&&p.uni===0&&p.age<=26&&p.smart>=40));
-$("ppl").innerHTML=p.chars.map(c=>'<div class="pc'+(pers===c.role?" on":"")+'" onclick="sel(\''+c.role+'\')"><div class="row"><span>'+c.emoji+" "+c.name+" <small>"+c.role+'</small></span><span>'+c.rel+'</span></div><div class="bar"><i style="width:'+c.rel+'%"></i></div></div>').join("");
-$("pa").classList.toggle("hide",!pers)}
-function sel(role){pers=pers===role?null:role;render()}
-function show(){$("start").classList.add("hide");$("game").classList.remove("hide");$("main").classList.remove("hide");render()}
-
+$("stat").textContent=m$(p.money)+" | "+w}
+function show(){$("start").classList.add("hide");$("over").classList.add("hide");$("game").classList.remove("hide");pl={x:160,y:100,d:2,mv:false};render()}
+function base(o){return Object.assign({health:100,happy:70,en:0,job:false,lvl:0,perf:0,love:"none",kids:0,crimes:0,grade:0,grad:false,uni:0,degree:false,studied:0,owed:null,everJob:false},o)}
 function newLife(){const T=Object.keys(TR);
-p={name:$("name").value||"Alex",age:0,gen:1,health:100,happy:70,smart:r(30,80),money:0,trait:T[r(0,3)],en:0,job:false,lvl:0,perf:0,love:"none",kids:0,crimes:0,grade:0,grad:false,uni:0,degree:false,studied:0,owed:null,sick:false,everJob:false,chars:[mk("Mom","👩",70),mk("Dad","👨",70),mk("Sibling","🧒",60)]};
+p=base({name:$("name").value||"Alex",age:0,gen:1,smart:r(30,80),money:0,trait:T[r(0,3)],chars:[mk("Mom","👩",70),mk("Dad","👨",70),mk("Sibling","🧒",60)]});
 p.en=maxEn();$("log").innerHTML="";
 log("<b>"+p.name+"</b> was born. Trait: "+TR[p.trait]+" ("+TD[p.trait]+").");
-log("Your parents are "+nm("Mom")+" and "+nm("Dad")+". Your sibling is "+nm("Sibling")+".");
+log("Parents: "+nm("Mom")+" and "+nm("Dad")+". Sibling: "+nm("Sibling")+". Walk to the Home door and sleep to grow up.");
 show();save()}
-function cont(){try{p=JSON.parse(localStorage.getItem("ls3"));pers=null;$("log").innerHTML="";log("Welcome back, "+p.name+".");show()}catch(e){}}
+function cont(){try{p=JSON.parse(localStorage.getItem("ls4"));$("log").innerHTML="";log("Welcome back, "+p.name+".");show()}catch(e){}}
 function nextGen(){const d=p,T=Object.keys(TR);
-p={name:NM[r(0,NM.length-1)],age:18,gen:d.gen+1,health:100,happy:70,smart:cl(Math.round(d.smart/2)+r(20,45)),money:Math.max(0,Math.round(d.money/2)),trait:T[r(0,3)],en:0,job:false,lvl:0,perf:0,love:"none",kids:0,crimes:0,grade:0,grad:true,uni:0,degree:false,studied:0,owed:null,sick:false,everJob:false,chars:[mk("Mom","👩",70),mk("Dad","👨",70),mk("Friend","🧑",50)]};
-p.en=maxEn();pers=null;$("over").classList.add("hide");$("log").innerHTML="";
-log("Gen "+p.gen+": <b>"+p.name+"</b>, age 18, inherited "+m$(p.money)+". Trait: "+TR[p.trait]+".");
-show();save()}
+p=base({name:NM[r(0,11)],age:18,gen:d.gen+1,smart:cl(Math.round(d.smart/2)+r(20,45)),money:Math.max(0,Math.round(d.money/2)),trait:T[r(0,3)],grad:true,chars:[mk("Mom","👩",70),mk("Dad","👨",70),mk("Friend","🧑",50)]});
+p.en=maxEn();$("log").innerHTML="";
+log("Gen "+p.gen+": <b>"+p.name+"</b>, age 18, inherited "+m$(p.money)+".");show();save()}
 
 function ageUp(){p.age++;p.en=maxEn();let m="Age "+p.age+".";
 if(p.job){p.money+=PAY[p.lvl];p.everJob=true;
-p.perf+=r(-10,6)+Math.round((ch("Boss").rel-50)/10);
+p.perf+=r(-10,6)+Math.round(((ch("Boss")||{rel:50}).rel-50)/10);
 if(p.perf>=60){if(p.lvl<4){p.lvl++;p.perf=30;m+=" Promoted to "+TITLES[p.lvl]+"!"}else p.perf=60}
 else if(p.perf<=0){p.job=false;p.perf=0;p.chars=p.chars.filter(c=>c.role!=="Boss");p.happy=cl(p.happy-15);m+=" You were fired!"}}
 if(p.kids)p.money-=p.kids*500;
+const ex=p.smart+p.studied*6+r(-20,20)+(p.trait==="genius"?10:0);
 if(p.age===6){p.grade=1;p.chars.push(mk("Friend","🧑",50));m+=" You started school and met "+nm("Friend")+"."}
-else if(p.grade>=1){const s=p.smart+p.studied*6+r(-20,20)+(p.trait==="genius"?10:0);
-if(s>=45){p.grade++;if(p.grade>12){p.grade=0;p.grad=true;m+=" You graduated high school!"}else m+=" Passed grade "+(p.grade-1)+"."}
+else if(p.grade>=1){if(ex>=45){p.grade++;if(p.grade>12){p.grade=0;p.grad=true;m+=" You graduated high school!"}else m+=" Passed grade "+(p.grade-1)+"."}
 else{p.happy=cl(p.happy-8);m+=" You failed the year and repeat grade "+p.grade+"."}}
-if(p.uni>0){p.money-=3000;const s=p.smart+p.studied*6+r(-20,20)+(p.trait==="genius"?10:0);
-if(s>=55){p.uni--;if(p.uni===0){p.degree=true;m+=" You graduated university!"}else m+=" Passed a university year."}
-else{p.happy=cl(p.happy-8);m+=" You failed a university exam and repeat the year."}}
-p.studied=0;
-p.health=cl(p.health-r(0,2)-Math.floor(p.age/30));
-if(p.health<40&&Math.random()<.4)p.sick=true;
-if(p.love!=="none"){p.happy=cl(p.happy+2);rel("Partner",r(-6,3));
-if(Math.random()<(p.love==="dating"?0.1:0.03)){breakup("Your relationship ended.")}}
-if(p.owed&&p.age>=p.owed.age){if(has("Friend")&&ch("Friend").rel>=50){p.money+=p.owed.amt;rel("Friend",10);m+=" "+nm("Friend")+" paid you back $"+p.owed.amt+"."}else{m+=" "+(has("Friend")?nm("Friend"):"Your friend")+" never paid you back."}p.owed=null}
+if(p.uni>0){p.money-=3000;if(ex>=55){p.uni--;if(!p.uni){p.degree=true;m+=" You graduated university!"}else m+=" Passed a university year."}else{p.happy=cl(p.happy-8);m+=" You failed a university exam."}}
+p.studied=0;p.health=cl(p.health-r(0,2)-Math.floor(p.age/30));
+if(p.health<40)m+=" You feel sick. Visit the hospital.";
+if(p.love!=="none"){p.happy=cl(p.happy+2);rel("Partner",r(-6,3));if(Math.random()<(p.love==="dating"?.1:.03))breakup("Your relationship ended.")}
+if(p.owed&&p.age>=p.owed.age){if(has("Friend")&&ch("Friend").rel>=50){p.money+=p.owed.amt;rel("Friend",10);m+=" "+nm("Friend")+" paid you back $"+p.owed.amt+"."}else m+=" Your friend never paid you back.";p.owed=null}
 if(Math.random()<.45){const E=[["You found $50!",0,5,50],["You caught the flu.",-10,-5,0],["Great day outside.",5,5,0],["You broke your arm.",-15,-5,-200],["You got a bonus.",0,6,500],["Your phone got stolen.",0,-8,-250],["You won a small lottery.",0,10,300]];
-const e=E[r(0,E.length-1)];p.health=cl(p.health+e[1]);p.happy=cl(p.happy+e[2]);p.money+=e[3];m+=" "+e[0]}
+const e=E[r(0,6)];p.health=cl(p.health+e[1]);p.happy=cl(p.happy+e[2]);p.money+=e[3];m+=" "+e[0]}
 log(m)}
 function study(){if(!use())return;p.smart=cl(p.smart+(p.age<18?7:4)+(p.trait==="genius"?3:0));p.studied++;p.happy=cl(p.happy-3);log("You studied hard.")}
 function gym(){if(!use())return;p.health=cl(p.health+6);log("You worked out.")}
-function fun(){if(!use())return;p.happy=cl(p.happy+7);p.money-=20;log("Fun day. -$20")}
+function fun(){if(!use())return;p.happy=cl(p.happy+7);p.money-=20;log("Fun day at the cafe. -$20")}
+function relax(){if(!use())return;p.happy=cl(p.happy+4);p.health=cl(p.health+1);log("You relaxed in the park.")}
+function treat(){p.money-=800;p.health=cl(p.health+30);log("Treatment done. -$800")}
 function work(){if(!use())return;p.perf+=12;p.happy=cl(p.happy-2);log("You worked extra hard.")}
-function job(){if(p.age<18)return log("Too young to work.",1);if(p.job)return log("You already have a job.",1);if(!use())return;
-if(Math.random()<.5+p.smart/200){p.job=true;p.lvl=p.degree?1:0;p.perf=30;p.everJob=true;p.chars.push(mk("Boss","🧑‍💼",50));log("You got a job: <b>"+TITLES[p.lvl]+"</b>. Your boss is "+nm("Boss")+".")}else log("No offers this time.",1)}
-function enroll(){if(!use())return;p.uni=4;log("You enrolled in university. It costs $3,000 a year (loans allowed).")}
+function job(){if(p.age<18)return log("Too young to work.",1);if(!use())return;
+if(Math.random()<.5+p.smart/200){p.job=true;p.lvl=p.degree?1:0;p.perf=30;p.chars.push(mk("Boss","🧑‍💼",50));log("You got a job: <b>"+TITLES[p.lvl]+"</b>. Boss: "+nm("Boss")+".")}else log("No offers this time.",1)}
+function enroll(){if(!use())return;p.uni=4;log("You enrolled in university. $3,000 a year.")}
 function breakup(t){p.love="none";p.chars=p.chars.filter(c=>c.role!=="Partner");p.happy=cl(p.happy-20);log(t+" Breakup.",1)}
-function love(){if(p.age<16)return log("Too young for love.",1);
-if(p.love==="dating"&&p.age<20)return log("Too young to marry.",1);if(!use())return;
+function love(){if(p.age<16)return log("Too young for love.",1);if(p.love==="dating"&&p.age<20)return log("Too young to marry.",1);if(!use())return;
 if(p.love==="none"){if(Math.random()<.3+p.happy/200){p.love="dating";p.chars.push(mk("Partner","❤️",60));p.happy=cl(p.happy+10);log("You started dating <b>"+nm("Partner")+"</b>!")}else{p.happy=cl(p.happy-3);log("No luck finding love.",1)}}
 else if(p.love==="dating"){if(Math.random()<.4+ch("Partner").rel/200){p.love="married";p.happy=cl(p.happy+15);p.money-=2000;log("You married "+nm("Partner")+"! Wedding cost $2,000.")}else breakup(nm("Partner")+" said no.")}
 else{p.happy=cl(p.happy+8);p.money-=100;rel("Partner",8);log("Date night. -$100")}}
 function kid(){if(!use())return;p.kids++;p.happy=cl(p.happy+10);p.money-=1000;log("A baby is born! Kids cost $500 a year each.")}
 function crime(){if(p.age<14)return log("Too young for crime.",1);if(!use())return;
-const ch2=.5+(p.trait==="lucky"?.05:0)+(p.trait==="risky"?.15:0);
-if(Math.random()<ch2){const g=r(200,2000);p.money+=g;p.happy=cl(p.happy-5);log("The crime worked. +"+m$(g))}
-else{p.crimes++;if(p.job){p.job=false;p.perf=0;p.chars=p.chars.filter(c=>c.role!=="Boss")}p.happy=cl(p.happy-20);p.health=cl(p.health-10);rel("Mom",-10);rel("Dad",-10);log("You got caught! Jailed, lost your job, and your parents are disappointed.",1)}}
-function pa(t){const c=ch(pers);if(!c||!use())return;
+if(Math.random()<.5+(p.trait==="lucky"?.05:0)+(p.trait==="risky"?.15:0)){const g=r(200,2000);p.money+=g;p.happy=cl(p.happy-5);log("The crime worked. +"+m$(g))}
+else{p.crimes++;if(p.job){p.job=false;p.perf=0;p.chars=p.chars.filter(c=>c.role!=="Boss")}p.happy=cl(p.happy-20);p.health=cl(p.health-10);rel("Mom",-10);rel("Dad",-10);log("You got caught! Jailed, lost your job, parents disappointed.",1)}}
+function pa(role,t){const c=ch(role);if(!c||!use())return;
 if(t==="talk"){c.rel=cl(c.rel+r(3,8));p.happy=cl(p.happy+2);log("You talked with "+c.name+".")}
 else if(t==="gift"){p.money-=50;c.rel=cl(c.rel+r(8,15));log("You gave "+c.name+" a gift. -$50")}
 else{c.rel=cl(c.rel-r(10,20));p.happy=cl(p.happy-3);log("You fought with "+c.name+".",1)}}
 
-const HOSP={q:"You are seriously ill. Pay $800 for treatment?",a:["Pay $800",()=>{p.money-=800;p.health=cl(p.health+30);return"Treatment worked. -$800"}],b:["Tough it out",()=>{p.health=cl(p.health-15);return"You got worse."}]};
 const EV=[
-{ok:()=>has("Friend")&&!p.owed,q:()=>nm("Friend")+" asks to borrow $300.",a:["Lend $300",()=>{p.money-=300;rel("Friend",15);p.owed={age:p.age+2,amt:300};return"You lent $300. "+nm("Friend")+" is grateful."}],b:["Refuse",()=>{rel("Friend",-15);return nm("Friend")+" is upset with you."}]},
+{ok:()=>has("Friend")&&!p.owed,q:()=>nm("Friend")+" asks to borrow $300.",a:["Lend $300",()=>{p.money-=300;rel("Friend",15);p.owed={age:p.age+2,amt:300};return"You lent $300."}],b:["Refuse",()=>{rel("Friend",-15);return nm("Friend")+" is upset."}]},
 {ok:()=>has("Mom"),q:()=>nm("Mom")+" wants you to visit.",a:["Visit",()=>{rel("Mom",10);p.happy=cl(p.happy+5);return"A lovely visit."}],b:["Skip",()=>{rel("Mom",-10);return nm("Mom")+" feels ignored."}]},
-{ok:()=>has("Dad"),q:()=>nm("Dad")+" offers you $200 if you do chores.",a:["Do chores",()=>{p.money+=200;p.happy=cl(p.happy-3);rel("Dad",6);return"+$200"}],b:["No thanks",()=>{rel("Dad",-4);return"Dad shrugs."}]},
 {ok:()=>p.job&&has("Boss"),q:()=>nm("Boss")+" asks you to work overtime.",a:["Accept",()=>{p.perf+=15;p.health=cl(p.health-8);rel("Boss",8);return"You impressed "+nm("Boss")+"."}],b:["Decline",()=>{p.perf-=5;rel("Boss",-8);return nm("Boss")+" is annoyed."}]},
 {ok:()=>has("Partner"),q:()=>"You and "+nm("Partner")+" had an argument.",a:["Apologize",()=>{rel("Partner",8);return"You made peace."}],b:["Stand your ground",()=>{rel("Partner",-15);p.happy=cl(p.happy-5);return"It got tense."}]},
-{ok:()=>has("Sibling"),q:()=>nm("Sibling")+" asks for your help.",a:["Help",()=>{rel("Sibling",10);p.happy=cl(p.happy+3);return"You helped out."}],b:["Ignore",()=>{rel("Sibling",-10);return"They got angry."}]},
 {ok:()=>true,q:()=>"A stranger offers a risky $500 investment.",a:["Invest",()=>{if(Math.random()<(p.trait==="lucky"?.65:.5)){p.money+=1000;return"It paid off! +$1,000"}p.money-=500;return"You lost $500."}],b:["Say no",()=>"You played it safe."]},
 {ok:()=>true,q:()=>"You find a wallet with $400.",a:["Keep it",()=>{p.money+=400;p.happy=cl(p.happy-4);return"You kept it. +$400"}],b:["Return it",()=>{p.happy=cl(p.happy+8);return"You returned it. Feels good."}]}];
-
-function maybeDecision(){
-if(p.sick){p.sick=false;pend=HOSP}
-else if(p.age>=8&&Math.random()<.35){const l=EV.filter(e=>e.ok());const e=l[r(0,l.length-1)];pend={q:e.q(),a:e.a,b:e.b}}
-else return;
-$("dq").textContent=pend.q;$("da").textContent=pend.a[0];$("db").textContent=pend.b[0];
-$("dec").classList.remove("hide");$("main").classList.add("hide")}
-function choose(k){const o=pend[k];log(o[1]());pend=null;
-$("dec").classList.add("hide");$("main").classList.remove("hide");
-partnerCheck();badges();render();if(!checkEnd(false))save()}
+function maybeDecision(){if(p.age<8||Math.random()>.35)return;
+const l=EV.filter(e=>e.ok()),e=l[r(0,l.length-1)];pend={q:e.q(),a:e.a,b:e.b};
+$("dq").textContent=pend.q;$("da").textContent=pend.a[0];$("db").textContent=pend.b[0];$("modal").classList.remove("hide")}
+function choose(k){log(pend[k][1]());pend=null;$("modal").classList.add("hide");partnerCheck();badges();render();if(!checkEnd(false))save()}
 function partnerCheck(){if(has("Partner")&&ch("Partner").rel<=0)breakup("Your relationship fell apart.")}
 function checkEnd(roll){
-const dead=p.health<=0||(roll&&p.age>=70&&Math.random()<(p.age-70)/50);
-if(!dead)return false;
+if(!(p.health<=0||(roll&&p.age>=70&&Math.random()<(p.age-70)/50)))return false;
 if(!p.everJob)unlock("nowork","Never worked");
 wipe();$("game").classList.add("hide");$("over").classList.remove("hide");
-const t=p.money>=300000?"died rich":p.money<0?"died in debt":"lived a simple life";
-$("ot").textContent=p.name+" "+t+" at "+p.age;
-$("ox").textContent="Money: "+m$(p.money)+" | Kids: "+p.kids+" | Crimes: "+p.crimes+" | Smarts: "+p.smart+" | Generation: "+p.gen;
-$("oa").textContent="🏆 Achievements unlocked: "+bad().length+"/10";
-$("nx").textContent=p.kids?"Continue as your child (gets half your money)":"Live again";
-$("nx").onclick=p.kids?nextGen:()=>location.reload();
-return true}
+$("ot").textContent=p.name+" "+(p.money>=300000?"died rich":p.money<0?"died in debt":"lived a simple life")+" at "+p.age;
+$("ox").textContent="Money: "+m$(p.money)+" | Kids: "+p.kids+" | Crimes: "+p.crimes+" | Smarts: "+p.smart+" | Gen "+p.gen;
+$("oa").textContent="🏆 Achievements: "+bad().length+"/7";
+$("nx").textContent=p.kids?"Continue as your child (half your money)":"Live again";
+$("nx").onclick=p.kids?nextGen:()=>location.reload();return true}
 function act(f){f();partnerCheck();badges();render();if(checkEnd(f===ageUp))return;if(f===ageUp)maybeDecision();save()}
-try{if(localStorage.getItem("ls3"))$("cont").classList.remove("hide")}catch(e){}
-</script></body></html>
+
+function panel(){const A=[],z=zone?zone.id:"";
+if(z==="home"){A.push(["Sleep (age up a year)",ageUp]);if(p.love==="married"&&p.age>=22)A.push(["Have a child",kid])}
+if(z==="school")A.push(["Study",study]);
+if(z==="uni")A.push(p.grad&&!p.degree&&!p.uni&&p.age<=26&&p.smart>=40?["Enroll ($3k/yr)",enroll]:["Needs school + smarts 40",null]);
+if(z==="office")A.push(p.job?["Work hard",work]:["Find job (18+)",job]);
+if(z==="gym")A.push(["Exercise",gym]);
+if(z==="park")A.push(["Relax in park",relax]);
+if(z==="cafe"){A.push(["Have fun (-$20)",fun]);A.push([p.love==="none"?"Find love":p.love==="dating"?"Propose":"Date night",love])}
+if(z==="hospital")A.push(["Treatment (-$800)",treat]);
+if(z==="alley")A.push(["Commit a crime",crime]);
+if(near){const rr=near.role;A.push(["Talk to "+near.name,()=>pa(rr,"talk")]);A.push(["Gift $50",()=>pa(rr,"gift")]);A.push(["Fight",()=>pa(rr,"fight")])}
+$("pt").textContent=(zone?zone.emoji+" "+zone.label:"Walking")+(near?" · "+near.emoji+" "+near.name+" ("+near.rel+")":"");
+const box=$("acts");box.innerHTML="";
+if(!A.length)box.innerHTML="<small>Walk to a building door or to a person.</small>";
+A.forEach(([t,f])=>{const b=document.createElement("button");b.textContent=t;b.style.cssText="width:100%;margin-top:5px";if(f)b.onclick=()=>act(f);else b.disabled=true;box.appendChild(b)})}
+
+function hit(x,y){if(x<6||x>W-6||y<4||y>H)return true;return B.some(b=>x+6>b.x&&x-6<b.x+70&&y>b.y&&y-4<b.y+70)}
+function wander(dt){p.chars.forEach(c=>{c.t-=dt;if(c.t<=0){c.t=r(10,25)/10;c.vx=[-1,0,1][r(0,2)];c.vy=[-1,0,1][r(0,2)];if(c.vx||c.vy)c.d=c.vx>0?1:c.vx<0?3:c.vy>0?2:0}
+const nx=c.x+c.vx*22*dt,ny=c.y+c.vy*22*dt;if(!hit(nx,c.y))c.x=nx;if(!hit(c.x,ny))c.y=ny})}
+function tick(dt){let dx=(keys.r?1:0)-(keys.l?1:0),dy=(keys.d?1:0)-(keys.u?1:0);
+pl.mv=!!(dx||dy);
+if(pl.mv){if(dx&&dy){dx*=.7;dy*=.7}pl.d=Math.abs(dx)>=Math.abs(dy)?(dx>0?1:3):(dy>0?2:0);
+const nx=pl.x+dx*80*dt,ny=pl.y+dy*80*dt;if(!hit(nx,pl.y))pl.x=nx;if(!hit(pl.x,ny))pl.y=ny}
+wander(dt);zone=null;
+for(const b of B)if(pl.x>b.x+8&&pl.x<b.x+62&&pl.y>=b.y+74&&pl.y<=b.y+100)zone=b;
+if(pl.x>125&&pl.x<195&&pl.y>174&&pl.y<240)zone=PK;
+near=null;let bd=28;p.chars.forEach(c=>{const d=Math.hypot(c.x-pl.x,c.y-pl.y);if(d<bd){bd=d;near=c}});
+const k=(zone?zone.id:"")+"|"+(near?near.role:"")+"|"+ver;if(k!==pk){pk=k;panel()}}
+
+function sprite(c,x,y,d,mv,col,hair,label,hl){x=Math.round(x);y=Math.round(y);
+c.fillStyle="rgba(0,0,0,.2)";c.fillRect(x-6,y-1,12,3);
+const s=mv&&Math.floor(performance.now()/150)%2;
+c.fillStyle="#2b2b3a";c.fillRect(x-4,y-6-(s?2:0),3,6+(s?2:0));c.fillRect(x+1,y-6-(s?0:2),3,6+(s?0:2));
+c.fillStyle=col;c.fillRect(x-5,y-14,10,8);
+c.fillStyle="#f1c9a0";c.fillRect(x-4,y-22,8,8);
+c.fillStyle=hair;c.fillRect(x-4,y-22,8,d===0?8:3);
+c.fillStyle="#222";if(d===2){c.fillRect(x-2,y-18,1,1);c.fillRect(x+1,y-18,1,1)}else if(d===1)c.fillRect(x+2,y-18,1,1);else if(d===3)c.fillRect(x-3,y-18,1,1);
+if(hl){c.strokeStyle="#2f6f5e";c.lineWidth=1;c.strokeRect(x-9,y-24,18,26)}
+c.font="bold 9px Georgia";c.textAlign="center";c.lineWidth=2.5;c.strokeStyle="#fff";c.strokeText(label,x,y-27);c.fillStyle="#222";c.fillText(label,x,y-27)}
+function draw(){const c=$("cv").getContext("2d");
+c.fillStyle="#9bc58a";c.fillRect(0,0,W,H);
+c.fillStyle="#d8cfa8";c.fillRect(0,85,W,85);c.fillRect(0,240,W,85);c.fillRect(0,395,W,35);
+c.fillStyle="#6fa65f";c.fillRect(125,170,70,70);c.fillStyle="#3f7a3a";
+[[140,185],[182,190],[150,226],[184,226]].forEach(t=>{c.beginPath();c.arc(t[0],t[1],8,0,7);c.fill()});
+c.textAlign="center";c.font="bold 10px Georgia";c.fillStyle=zone===PK?"#fff":"#1f3f1c";c.fillText("Park",160,209);
+B.forEach(b=>{c.fillStyle=b.col;c.fillRect(b.x,b.y,70,70);c.fillStyle="rgba(0,0,0,.25)";c.fillRect(b.x,b.y,70,14);
+c.fillStyle="#fff";c.font="bold 10px Georgia";c.fillText(b.label,b.x+35,b.y+11);
+c.font="24px serif";c.fillStyle="#000";c.fillText(b.emoji,b.x+35,b.y+44);
+c.fillStyle="#5a3b22";c.fillRect(b.x+28,b.y+58,14,12);
+if(zone===b){c.fillStyle="rgba(47,111,94,.55)";c.fillRect(b.x+8,b.y+74,54,26)}});
+const L=p.chars.map(h=>({y:h.y,h})).concat([{y:pl.y,h:null}]).sort((a,b)=>a.y-b.y);
+L.forEach(o=>{if(o.h){const h=o.h;sprite(c,h.x,h.y,h.d,h.vx||h.vy,hc(h.name+h.role,7),"#3a2a1a",h.name,near===h)}
+else sprite(c,pl.x,pl.y,pl.d,pl.mv,hc(p.name,13),"#2a1a10",p.name,false)})}
+function loop(t){const dt=Math.min(.05,(t-last)/1000||0);last=t;
+if(p&&!$("game").classList.contains("hide")){if(!pend)tick(dt);draw()}requestAnimationFrame(loop)}
+document.querySelectorAll(".dp").forEach(b=>{const k=b.dataset.k;
+b.onpointerdown=e=>{e.preventDefault();keys[k]=1};
+["onpointerup","onpointerleave","onpointercancel"].forEach(ev=>b[ev]=()=>{keys[k]=0});
+b.oncontextmenu=e=>e.preventDefault()});
+const KM={ArrowUp:"u",Ar
