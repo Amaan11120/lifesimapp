@@ -16,7 +16,7 @@ button:disabled{opacity:.5}
 #log p{margin:0 0 5px;border-bottom:1px solid #ddd5c4;padding-bottom:4px}#log p.bad{color:#b3402e}
 #modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9}
 .hide{display:none!important}
-</style></head><body>
+</style></head><body><div id="err" style="color:#fff;background:#b3402e;font:12px monospace;padding:6px;display:none"></div><script>window.onerror=function(m,s,l){var e=document.getElementById("err");e.style.display="block";e.textContent+=m+" (line "+l+") ";}</script>
 <div id="start" class="card"><h1>Life Sim</h1>
 <input id="name" placeholder="Name your character" style="width:100%;padding:12px;font:inherit;margin:8px 0">
 <button class="go" style="width:100%" onclick="newLife()">Start life</button>
@@ -212,4 +212,9 @@ document.querySelectorAll(".dp").forEach(b=>{const k=b.dataset.k;
 b.onpointerdown=e=>{e.preventDefault();keys[k]=1};
 ["onpointerup","onpointerleave","onpointercancel"].forEach(ev=>b[ev]=()=>{keys[k]=0});
 b.oncontextmenu=e=>e.preventDefault()});
-const KM={ArrowUp:"u",Ar
+const KM={ArrowUp:"u",ArrowDown:"d",ArrowLeft:"l",ArrowRight:"r"};
+addEventListener("keydown",e=>{if(KM[e.key]){keys[KM[e.key]]=1;e.preventDefault()}});
+addEventListener("keyup",e=>{if(KM[e.key])keys[KM[e.key]]=0});
+try{if(localStorage.getItem("ls4"))$("cont").classList.remove("hide")}catch(e){}
+requestAnimationFrame(loop);
+</script></body></html>
